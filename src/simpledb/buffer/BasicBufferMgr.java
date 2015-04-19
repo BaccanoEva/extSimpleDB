@@ -1,5 +1,7 @@
 package simpledb.buffer;
 
+import java.util.HashMap;
+
 import simpledb.file.*;
 
 /**
@@ -7,9 +9,17 @@ import simpledb.file.*;
  * @author Edward Sciore
  *
  */
-class BasicBufferMgr {
+class BasicBufferMgr 
+{
    private Buffer[] bufferpool;
    private int numAvailable;
+   
+   /*
+    * Akond April 19, 2015 
+    * 
+    * */
+   //Block block = new B
+   HashMap<Block, Buffer> bufferBlockMap = new HashMap< Block, Buffer>();   
    
    /**
     * Creates a buffer manager having the specified number 
@@ -50,16 +60,30 @@ class BasicBufferMgr {
     * @param blk a reference to a disk block
     * @return the pinned buffer
     */
-   synchronized Buffer pin(Block blk) {
+   synchronized Buffer pin(Block blk) 
+   {
       Buffer buff = findExistingBuffer(blk);
-      if (buff == null) {
+      if (buff == null) 
+      {
+    	 System.out.println("asi mama !"); 
          buff = chooseUnpinnedBuffer();
          if (buff == null)
-            return null;
-         buff.assignToBlock(blk);
+         {
+             return null;        	 
+         }
+
+         //buff.assignToBlock(blk);
+         /*
+          * Added by Akond on April 19, 2015 
+          * */
+         
+         bufferBlockMap.put(blk, buff);
       }
       if (!buff.isPinned())
-         numAvailable--;
+      {
+          numAvailable--;    	  
+      }
+
       buff.pin();
       return buff;
    }
@@ -87,10 +111,22 @@ class BasicBufferMgr {
     * Unpins the specified buffer.
     * @param buff the buffer to be unpinned
     */
-   synchronized void unpin(Buffer buff) {
+   synchronized void unpin(Buffer buff) 
+   {
+	  Block blockObj =  buff.block(); 
       buff.unpin();
       if (!buff.isPinned())
-         numAvailable++;
+      {
+          numAvailable++;    	  
+      }
+      
+      /*
+       * 
+       * Added by Akond : April 19, 2015
+       * 
+       * */
+      bufferBlockMap.remove(blockObj, buff);
+
    }
    
    /**
@@ -101,13 +137,38 @@ class BasicBufferMgr {
       return numAvailable;
    }
    
-   private Buffer findExistingBuffer(Block blk) {
-      for (Buffer buff : bufferpool) {
+   private Buffer findExistingBuffer(Block blk) 
+   {
+	   Buffer buffToret = null ;
+	      /*
+	       * 
+	       * Added by Akond : April 19, 2015
+	       * 
+	       * */
+	   
+	  /* 
+      for (Buffer buff : bufferpool) 
+      {
          Block b = buff.block();
          if (b != null && b.equals(blk))
-            return buff;
+         {
+             return buff;        	 
+         }
+
       }
       return null;
+      
+      */
+      if(containsMapping(blk))
+      {
+    	  //System.out.println("asi mama !");
+    	  buffToret = getMapping(blk);
+    	  
+      }
+      
+      return buffToret ;
+      
+      
    }
    
    private Buffer chooseUnpinnedBuffer() {
@@ -116,4 +177,15 @@ class BasicBufferMgr {
          return buff;
       return null;
    }
+   
+   public boolean containsMapping(Block blk)
+   {
+	   return bufferBlockMap.containsKey(blk);
+	   
+   }
+   
+   public Buffer getMapping (Block blk)
+   {
+	   return bufferBlockMap.get(blk);
+   }  
 }
