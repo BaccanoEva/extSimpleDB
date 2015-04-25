@@ -127,12 +127,13 @@ public class BufferMgr
    private boolean waitingTooLong(long starttime) {
       return System.currentTimeMillis() - starttime > MAX_TIME;
    }
+   /*
    
    /*
     * 
     * Akond: April 19, 2015
     * 
-    * */
+    * 
    
    public boolean containsMapping(Block blk)
    {
@@ -143,4 +144,6 @@ public class BufferMgr
    {
 	   return bufferMgr.getMapping(blk);
    }
+   
+   */
 }

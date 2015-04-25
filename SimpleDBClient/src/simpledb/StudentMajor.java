@@ -1,13 +1,9 @@
-package MySimpleDBClient;
+package simpledb;
 import java.sql.*;
 import simpledb.remote.SimpleDriver;
 
-public class FindMajors {
+public class StudentMajor {
     public static void main(String[] args) {
-		String major = args[0];
-		System.out.println("Here are the " + major + " majors");
-		System.out.println("Name\tGradYear");
-
 		Connection conn = null;
 		try {
 			// Step 1: connect to database server
@@ -16,21 +12,21 @@ public class FindMajors {
 
 			// Step 2: execute the query
 			Statement stmt = conn.createStatement();
-			String qry = "select sname, gradyear "
-			           + "from student, dept "
-			           + "where did = majorid "
-			           + "and dname = '" + major + "'";
+			String qry = "select SName, DName "
+			           + "from DEPT, STUDENT "
+			           + "where MajorId = DId";
 			ResultSet rs = stmt.executeQuery(qry);
 
 			// Step 3: loop through the result set
+			System.out.println("Name\tMajor");
 			while (rs.next()) {
-				String sname = rs.getString("sname");
-				int gradyear = rs.getInt("gradyear");
-				System.out.println(sname + "\t" + gradyear);
+				String sname = rs.getString("SName");
+				String dname = rs.getString("DName");
+				System.out.println(sname + "\t" + dname);
 			}
 			rs.close();
 		}
-		catch(Exception e) {
+		catch(SQLException e) {
 			e.printStackTrace();
 		}
 		finally {

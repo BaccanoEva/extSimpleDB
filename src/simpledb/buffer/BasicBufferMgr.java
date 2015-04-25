@@ -1,6 +1,7 @@
 package simpledb.buffer;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import simpledb.file.*;
 
@@ -15,11 +16,15 @@ class BasicBufferMgr
    private int numAvailable;
    
    /*
-    * Akond April 19, 2015 
+    * Change #
+    * Mapping created .... 
+    * This mapping will be used to allocate, un-allocate, and find an existing mapping between blocks and buffer 
     * 
     * */
-   //Block block = new B
-   HashMap<Block, Buffer> bufferBlockMap = new HashMap< Block, Buffer>();   
+   Map<Block, Buffer> bufferBlockMap = new HashMap<Block, Buffer>() ;   
+   
+
+
    
    /**
     * Creates a buffer manager having the specified number 
@@ -38,7 +43,10 @@ class BasicBufferMgr
       bufferpool = new Buffer[numbuffs];
       numAvailable = numbuffs;
       for (int i=0; i<numbuffs; i++)
-         bufferpool[i] = new Buffer();
+      {
+          bufferpool[i] = new Buffer();    	  
+      }
+      
    }
    
    /**
@@ -65,19 +73,32 @@ class BasicBufferMgr
       Buffer buff = findExistingBuffer(blk);
       if (buff == null) 
       {
-    	 System.out.println("asi mama !"); 
+
          buff = chooseUnpinnedBuffer();
          if (buff == null)
          {
              return null;        	 
          }
 
-         //buff.assignToBlock(blk);
+         buff.assignToBlock(blk);
          /*
-          * Added by Akond on April 19, 2015 
+          * Change #
+          * creating the mapping here 
+          * 
           * */
-         
-         bufferBlockMap.put(blk, buff);
+         assignBuffToblock(blk, buff);
+
+
+      }
+      else 
+      {
+    	  /*
+    	   * Change #
+    	   * Just keeping track of when the buffer is obtained from the mapping via console message  
+    	   * 
+    	   * */
+    	 // System.out.println("a buffer was obtained from the mapping");
+    	  
       }
       if (!buff.isPinned())
       {
@@ -85,6 +106,7 @@ class BasicBufferMgr
       }
 
       buff.pin();
+
       return buff;
    }
    
@@ -102,6 +124,13 @@ class BasicBufferMgr
       if (buff == null)
          return null;
       buff.assignToNew(filename, fmtr);
+      /*
+       * Change #
+       * assigning the appropriate  block to a buffer 
+       * 
+       * 
+       * */
+      assignBuffToblock(buff.block(), buff);
       numAvailable--;
       buff.pin();
       return buff;
@@ -117,15 +146,21 @@ class BasicBufferMgr
       buff.unpin();
       if (!buff.isPinned())
       {
+    	  /*
+    	   * Change #
+    	   * First checking if there is an exiting mapping 
+    	   * */
+    	 if(containsMapping(blockObj))
+    	  {
+    		  /*
+    		   * Change #
+    		   * if there is a mapping then un-allocate the buffer 
+    		   * 
+    		   * */
+    		  unassignBlockToBuff( buff);
+    	 }
           numAvailable++;    	  
       }
-      
-      /*
-       * 
-       * Added by Akond : April 19, 2015
-       * 
-       * */
-      bufferBlockMap.remove(blockObj, buff);
 
    }
    
@@ -139,36 +174,41 @@ class BasicBufferMgr
    
    private Buffer findExistingBuffer(Block blk) 
    {
+	   /*
+	    * Change #
+	    * The variable to return the buffer 
+	    * */
 	   Buffer buffToret = null ;
-	      /*
-	       * 
-	       * Added by Akond : April 19, 2015
-	       * 
-	       * */
+	   /*
+	    * Change #
+	    * Sequential accessing  will not work any more 
+	    * 
+	    * */
 	   
-	  /* 
+	  /*
       for (Buffer buff : bufferpool) 
       {
+    	  
          Block b = buff.block();
          if (b != null && b.equals(blk))
          {
              return buff;        	 
          }
-
       }
-      return null;
-      
-      */
-      if(containsMapping(blk))
-      {
-    	  //System.out.println("asi mama !");
-    	  buffToret = getMapping(blk);
+      return null; 
+	   */
+	   /*
+	    * Change #
+	    * Looking up the map the find an existing buffer 
+	    * 
+	    * */
+         if(containsMapping(blk))
+         {
+        	 buffToret =  getMapping(blk);
+         }
     	  
-      }
-      
-      return buffToret ;
-      
-      
+         
+         return buffToret ;
    }
    
    private Buffer chooseUnpinnedBuffer() {
@@ -186,6 +226,45 @@ class BasicBufferMgr
    
    public Buffer getMapping (Block blk)
    {
+	   //System.out.println("returning the block ..");
 	   return bufferBlockMap.get(blk);
-   }  
+   } 
+   /*
+    * Change #
+    * We created this method to assign a buffer to a block from the map created 
+    * 
+    * */
+   private void assignBuffToblock( Block blockParam, Buffer bufferParam) 
+   {
+	   
+	   bufferBlockMap.put( blockParam, bufferParam) ;
+   }
+   
+   /*
+    * Change #
+    * We created this method to un-map a block for a buffer 
+    * 
+    * if the object is a buffer , then we get the corresponding block, and then remove the block 
+    * 
+    * */
+   
+   
+   private void unassignBlockToBuff(Buffer bufferParam )
+   {
+	   /*
+	   if(keyParam instanceof Block)
+	   {
+		   bufferBlockMap.remove(keyParam);
+	   }
+	   else if (keyParam instanceof Buffer)
+	   {
+		   Block blkObj = ((Buffer) keyParam).block();
+		   bufferBlockMap.remove(blkObj);
+	   }
+	    */
+	   
+	   bufferBlockMap.remove(bufferParam.block());
+   }
+   
+   
 }
