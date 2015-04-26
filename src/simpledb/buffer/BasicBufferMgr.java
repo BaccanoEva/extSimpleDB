@@ -21,7 +21,7 @@ class BasicBufferMgr
     * This mapping will be used to allocate, un-allocate, and find an existing mapping between blocks and buffer 
     * 
     * */
-   Map<Block, Buffer> bufferBlockMap = new HashMap<Block, Buffer>() ;   
+   Map<Block, Buffer> bufferPoolMap = new HashMap<Block, Buffer>() ;   
    
 
 
@@ -220,14 +220,14 @@ class BasicBufferMgr
    
    public boolean containsMapping(Block blk)
    {
-	   return bufferBlockMap.containsKey(blk);
+	   return bufferPoolMap.containsKey(blk);
 	   
    }
    
    public Buffer getMapping (Block blk)
    {
 	   //System.out.println("returning the block ..");
-	   return bufferBlockMap.get(blk);
+	   return bufferPoolMap.get(blk);
    } 
    /*
     * Change #
@@ -237,7 +237,7 @@ class BasicBufferMgr
    private void assignBuffToblock( Block blockParam, Buffer bufferParam) 
    {
 	   
-	   bufferBlockMap.put( blockParam, bufferParam) ;
+	   bufferPoolMap.put( blockParam, bufferParam) ;
    }
    
    /*
@@ -253,7 +253,7 @@ class BasicBufferMgr
    {
 
 	   
-	   bufferBlockMap.remove(bufferParam.block());
+	   bufferPoolMap.remove(bufferParam.block());
    }
    
    
