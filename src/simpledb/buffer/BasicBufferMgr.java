@@ -251,17 +251,7 @@ class BasicBufferMgr
    
    private void unassignBlockToBuff(Buffer bufferParam )
    {
-	   /*
-	   if(keyParam instanceof Block)
-	   {
-		   bufferBlockMap.remove(keyParam);
-	   }
-	   else if (keyParam instanceof Buffer)
-	   {
-		   Block blkObj = ((Buffer) keyParam).block();
-		   bufferBlockMap.remove(blkObj);
-	   }
-	    */
+
 	   
 	   bufferBlockMap.remove(bufferParam.block());
    }

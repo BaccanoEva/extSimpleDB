@@ -94,6 +94,11 @@ public class Page {
     * 
     * 
     * **/
+   /*
+    * 
+    * The format using which date will be stored. 
+    * 
+    * */
   String theFormat="yyyyMMdd";
   SimpleDateFormat dateFormatObj = new SimpleDateFormat(theFormat);
    
@@ -213,6 +218,12 @@ public class Page {
 	}
 	
 	*/ 
+   
+   /*
+    * 
+    * Setting date here: byte value is converted to string and then to date  
+    * 
+    * */
    public synchronized void setDate(int offset, Date val) 
    {
 	      contents.position(offset);
@@ -222,6 +233,10 @@ public class Page {
 	      contents.put(byteval);
    } 
    
+   /*
+    * 
+    * Getting date here: byte value is converted to string and then to date 
+    * */
    public synchronized Date getDate(int offset) 
    {
 	      contents.position(offset);
@@ -236,7 +251,7 @@ public class Page {
    
    /*
     * 
-    * byte aray  handling 
+    * Setting byte array  here 
     * 
     * */   
   
@@ -247,6 +262,11 @@ public class Page {
 	      contents.put(byteArrayParam);
    }     
    
+   /*
+    * 
+    * Getting byte array  here 
+    * 
+    * */ 
    public synchronized byte[] getByteArray(int offset) 
    {
 
@@ -258,8 +278,8 @@ public class Page {
 	}
    
    /*
-    * 
-    * boolean handling 
+    *  Setting Boolean 
+    * The string 'true' or 'false' is stored here  
     * 
     * */
    
@@ -279,7 +299,11 @@ public class Page {
 	      contents.putInt(byteval.length);
 	      contents.put(byteval);
    }     
-   
+   /*
+    *  Getting Boolean 
+    * The string 'true' or 'false' is retrieved  here and the the corresponsing boolean vale is returned  
+    * 
+    * */
    public synchronized boolean getBoolean(int offset) 
    {
 	      boolean boolToret; 
@@ -304,6 +328,7 @@ public class Page {
      /*
       * 
       * Short data type handling 
+      * Setting short data type. Short value is converted to byte array and stored 
       * 
       * */
    
@@ -315,7 +340,12 @@ public class Page {
 	      contents.putInt(byteval.length);
 	      contents.put(byteval);
    }    
-   
+   /*
+    * 
+    * Short data type handling 
+    * Getting short data type. Short value is converted from  byte array that was stored previously 
+    * 
+    * */
    public synchronized short getShort(int offset) 
    {
 	      Short shortValToret  ;
@@ -368,6 +398,11 @@ public class Page {
     	 strToret = dateFormatObj.format(dateParam);
     	 return strToret ;
      } 
+     
+     /*
+      * 
+      * String to date converter 
+      * */
      
      private Date convertStringToDate(String strParam)
      {
